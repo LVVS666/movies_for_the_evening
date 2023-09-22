@@ -84,6 +84,19 @@ def add_movie_in_db(user, movie):
     conn.close()
 
 
+def search_movies_in_db(movie):
+    conn = sqlite3.connect('date_user_movies.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM movies WHERE name = ?', (movie.name,))
+    found_movies = cursor.fetchall()
+    conn.close()
+    if found_movies:
+        return True
+    else:
+        return False
+
+
+
 
 
 
