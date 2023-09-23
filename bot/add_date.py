@@ -47,7 +47,7 @@ def add_second_user_in_session(second_user):
     conn.close()
 
 
-def add_movie_in_db(user, movie):
+def add_movie_in_db(user, poster, name, year, description):
     conn = sqlite3.connect('date_user_movies.db')
     cursor = conn.cursor()
     cursor.execute(
@@ -65,10 +65,10 @@ def add_movie_in_db(user, movie):
     cursor.execute('SELECT id FROM users WHERE user_id = ?', (user_id_to_find,))
     user_id = cursor.fetchone()[0]
     movie_data = {
-        'poster': movie.poster,
-        'name': movie.name,
-        'year': movie.year,
-        'description': movie.description,
+        'poster': poster,
+        'name': name,
+        'year': year,
+        'description': description,
     }
     cursor.execute(
         '''INSERT INTO movies (poster, name, year, description, user_id)
