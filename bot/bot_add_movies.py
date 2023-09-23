@@ -22,7 +22,9 @@ async def start(message: Message):
     image = item['poster']
     await message.answer_photo(types.InputFile(io.BytesIO(image),
                                                filename='poster.jpg'),
-                                               caption=f'{item["name"]}\n{item["year"]}\n{item["description"]}'
+                                               caption=f'Название: {item["name"]}'
+                                                       f'\nГод: {item["year"]}'
+                                                       f'\nОписание: {item["description"]}'
                                )
 
 
