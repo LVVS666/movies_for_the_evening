@@ -65,18 +65,15 @@ def add_movie_in_db(user, poster, name, year, description):
     cursor.execute('SELECT id FROM users WHERE user_id = ?', (user_id_to_find,))
     user_id = cursor.fetchone()[0]
     movie_data = {
-        'poster': poster,
         'name': name,
         'year': year,
-        'description': description,
     }
     cursor.execute(
-        '''INSERT INTO movies (poster, name, year, description, user_id)
+        '''INSERT INTO movies (name, year, user_id)
          VALUES (?, ?, ?, ?, ?)''',
-        (movie_data['poster'],
+        (
          movie_data['name'],
          movie_data['year'],
-         movie_data['description'],
          user_id
          )
     )
