@@ -24,6 +24,7 @@ dp = Dispatcher()
 async def start(message: Message, state: FSMContext):
     global user_id
     global item
+    add_date.create_db()
     user_id = message.from_user.id
     if add_date.search_user_in_db(user_id) == False:
         add_date.users_add_to_session(user_id)

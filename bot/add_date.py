@@ -3,8 +3,7 @@ import string
 import random
 
 
-def users_add_to_session(user):
-    global session_id
+def create_db():
     conn = sqlite3.connect('date_user_movies.db')
     cursor = conn.cursor()
     cursor.execute(
@@ -25,6 +24,13 @@ def users_add_to_session(user):
         FOREIGN KEY (session_id) REFERENCES sessions(id)
         '''
     )
+    conn.commit()
+    conn.close()
+
+def users_add_to_session(user):
+    global session_id
+    conn = sqlite3.connect('date_user_movies.db')
+    cursor = conn.cursor()
     session_name = ''
     for i in range(10):
         i = random.choice(string.ascii_letters)
