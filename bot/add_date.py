@@ -21,7 +21,7 @@ def users_add_to_session(user):
         CREATE TABLE IF NOT EXISTS users
         (
         id INTEGER PRIMARY KEY AUTOINCREMENT, 
-        user_id INTEGER,
+        user_name_id TEXT,
         FOREIGN KEY (session_id) REFERENCES sessions(id)
         '''
     )
@@ -47,7 +47,7 @@ def add_second_user_in_session(second_user):
     conn.close()
 
 
-def add_movie_in_db(user, poster, name, year, description):
+def add_movie_in_db(user, name, year):
     conn = sqlite3.connect('date_user_movies.db')
     cursor = conn.cursor()
     cursor.execute(
@@ -81,10 +81,12 @@ def add_movie_in_db(user, poster, name, year, description):
     conn.close()
 
 
-def search_movies_in_db(movie):
+def search_movies_in_db(user, movie):
     conn = sqlite3.connect('date_user_movies.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM movies WHERE name = ?', (movie.name,))
+    cursor.execute('''SELECT * FROM movies'
+                   WHERE user_id = (SELECT id FROM users WHERE user_name_id = ?)
+                   AND name = ? ''', (user, movie))
     found_movies = cursor.fetchall()
     conn.close()
     if found_movies:
@@ -92,7 +94,16 @@ def search_movies_in_db(movie):
     else:
         return False
 
-
+def search_user_in_db(user):
+    conn = sqlite3.connect('date_user_movies.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM users WHERE user_id = ?', (user,))
+    found_user = cursor.fetchall()
+    conn.close()
+    if found_user:
+        return True
+    else:
+        return False
 
 
 
