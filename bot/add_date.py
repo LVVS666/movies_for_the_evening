@@ -20,8 +20,9 @@ def create_db():
         CREATE TABLE IF NOT EXISTS users
         (
         id INTEGER PRIMARY KEY AUTOINCREMENT, 
-        user_name_id TEXT,
-        FOREIGN KEY (session_id) REFERENCES sessions(id)
+        user_name_id INTEGER,
+        session_id INTEGER,
+        FOREIGN KEY (session_id) REFERENCES sessions(id))
         '''
     )
     conn.commit()
@@ -39,7 +40,7 @@ def users_add_to_session(user):
     cursor.execute('INSERT INTO sessions (session_name) VALUES (?)', (session_name,))
     session_id = cursor.lastrowid
     user_id = user.from_user.id
-    cursor.execute('INSERT INTO users (user_id, session_id) VALUES (?, ?)', (user_id, session_id))
+    cursor.execute('INSERT INTO users (user_name_id, session_id) VALUES (?, ?)', (user_id, session_id))
     conn.commit()
     conn.close()
 
@@ -103,7 +104,7 @@ def search_movies_in_db(user, movie):
 def search_user_in_db(user):
     conn = sqlite3.connect('date_user_movies.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM users WHERE user_id = ?', (user,))
+    cursor.execute('SELECT * FROM users WHERE user_name_id = ?', (user.from_user.id,))
     found_user = cursor.fetchall()
     conn.close()
     if found_user:

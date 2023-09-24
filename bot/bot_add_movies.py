@@ -17,17 +17,15 @@ load_dotenv()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 bot = Bot(BOT_TOKEN)
 dp = Dispatcher()
+add_date.create_db()
 
 
 
 @dp.message(Command('start'))
 async def start(message: Message, state: FSMContext):
-    global user_id
     global item
-    add_date.create_db()
-    user_id = message.from_user.id
-    if add_date.search_user_in_db(user_id) == False:
-        add_date.users_add_to_session(user_id)
+    if add_date.search_user_in_db(message) == False:
+        add_date.users_add_to_session(message)
         await message.answer('Введите ID второго пользователя:')
         await state.set_state(FSM.UserState.user_add_db_state)
     else:
@@ -75,7 +73,7 @@ async def watch_movie(message:Message):
                                    reply_markup=keyboard.keyboard
                                    )
     else:
-        add_date.add_movie_in_db(user_id, item['name'], item['year'])
+        add_date.add_movie_in_db(message, item['name'], item['year'])
     item = await parser_movies.create_date_movie()
     image = item['poster']
     await message.answer_photo(types.InputFile(io.BytesIO(image),
