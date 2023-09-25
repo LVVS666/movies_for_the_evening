@@ -42,7 +42,7 @@ async def start(message: Message, state: FSMContext):
 @dp.message(FSM.UserState.user_add_db_state, F.text)
 async def add_to_second_users_to_bd(message: Message, state: FSMContext):
     global second_user_id
-    second_user_id = message.text
+    second_user_id = int(message.text)
     add_date.add_second_user_in_session(second_user_id)
     await message.answer('Пользователь успешно добавлен!')
     state.clear()

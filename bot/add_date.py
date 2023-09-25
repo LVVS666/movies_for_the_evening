@@ -48,8 +48,8 @@ def users_add_to_session(user):
 def add_second_user_in_session(second_user):
     conn = sqlite3.connect('date_user_movies.db')
     cursor = conn.cursor()
-    user_id = second_user.from_user.id
-    cursor.execute('INSERT INTO users (user_id, session_id) VALUES (?, ?)', (user_id, session_id))
+    user_id = second_user
+    cursor.execute('INSERT INTO users (user_name_id, session_id) VALUES (?, ?)', (user_id, session_id))
     conn.commit()
     conn.close()
 
