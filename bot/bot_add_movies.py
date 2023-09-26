@@ -39,16 +39,18 @@ async def start(message: Message, state: FSMContext):
                                    reply_markup=keyboard.keyboard
                                    )
 
+
 @dp.message(FSM.UserState.user_add_db_state, F.text)
 async def add_to_second_users_to_bd(message: Message, state: FSMContext):
     global second_user_id
+    global item
     second_user_id = int(message.text)
     add_date.add_second_user_in_session(second_user_id)
     await message.answer('Пользователь успешно добавлен!')
-    state.clear()
+    await state.clear()
     item = await parser_movies.create_date_movie()
     image = item['poster']
-    await message.answer_photo(types.InputFile(io.BytesIO(image),filename='poster.jpg'),
+    await message.answer_photo(types.InputFile(io.BytesIO(image), filename='poster.jpg'),
                                caption=f'Название: {item["name"]}'
                                        f'\nГод: {item["year"]}'
                                        f'\nОписание: {item["description"]}',
@@ -56,10 +58,8 @@ async def add_to_second_users_to_bd(message: Message, state: FSMContext):
                                )
 
 
-
-
 @dp.message(F.text=='Смотреть')
-async def watch_movie(message:Message):
+async def watch_movie(message: Message):
     global item
     if add_date.search_movies_in_db(second_user_id, item['name']):
         await message.answer('Фильм есть у второго пользователя!Приятного просмотра')
@@ -86,7 +86,7 @@ async def watch_movie(message:Message):
 
 
 @dp.message(F.text=='Не смотреть')
-async def not_watch_movie(message:Message):
+async def not_watch_movie(message: Message):
     item = await parser_movies.create_date_movie()
     image = item['poster']
     await message.answer_photo(types.InputFile(io.BytesIO(image),
