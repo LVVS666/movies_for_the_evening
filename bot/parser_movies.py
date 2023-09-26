@@ -36,9 +36,3 @@ async def create_date_movie():
 
 
 
-
-
-
-
-
-

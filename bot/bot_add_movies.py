@@ -1,5 +1,6 @@
 import asyncio
 import io
+import tempfile
 
 from aiogram import Bot, Dispatcher,types, F
 import os
@@ -31,8 +32,7 @@ async def start(message: Message, state: FSMContext):
     else:
         item = await parser_movies.create_date_movie()
         image = item['poster']
-        await message.answer_photo(types.InputFile(io.BytesIO(image),
-                                                   filename='poster.jpg'),
+        await message.answer_photo(types.InputFile(io.BytesIO(image), filename='poster.jpg'),
                                    caption=f'Название: {item["name"]}'
                                            f'\nГод: {item["year"]}'
                                            f'\nОписание: {item["description"]}',
@@ -43,7 +43,6 @@ async def start(message: Message, state: FSMContext):
 @dp.message(FSM.UserState.user_add_db_state, F.text)
 async def add_to_second_users_to_bd(message: Message, state: FSMContext):
     global second_user_id
-    global item
     second_user_id = int(message.text)
     add_date.add_second_user_in_session(second_user_id)
     await message.answer('Пользователь успешно добавлен!')
