@@ -2,7 +2,7 @@ import asyncio
 import io
 import tempfile
 
-from aiogram import Bot, Dispatcher,types, F
+from aiogram import Bot, Dispatcher, types, F
 import os
 from aiogram.filters.command import Command
 from aiogram.types import Message
@@ -21,7 +21,6 @@ dp = Dispatcher()
 add_date.create_db()
 
 
-
 @dp.message(Command('start'))
 async def start(message: Message, state: FSMContext):
     global item
@@ -32,7 +31,7 @@ async def start(message: Message, state: FSMContext):
     else:
         item = await parser_movies.create_date_movie()
         image = item['poster']
-        await message.answer_photo(types.InputFile(io.BytesIO(image), filename='poster.jpg'),
+        await message.answer_photo(types.BufferedInputFile(image, filename='poster.jpg'),
                                    caption=f'Название: {item["name"]}'
                                            f'\nГод: {item["year"]}'
                                            f'\nОписание: {item["description"]}',
@@ -49,7 +48,7 @@ async def add_to_second_users_to_bd(message: Message, state: FSMContext):
     await state.clear()
     item = await parser_movies.create_date_movie()
     image = item['poster']
-    await message.answer_photo(types.InputFile(io.BytesIO(image), filename='poster.jpg'),
+    await message.answer_photo(types.BufferedInputFile(image, filename='poster.jpg'),
                                caption=f'Название: {item["name"]}'
                                        f'\nГод: {item["year"]}'
                                        f'\nОписание: {item["description"]}',
@@ -64,7 +63,7 @@ async def watch_movie(message: Message):
         await message.answer('Фильм есть у второго пользователя!Приятного просмотра')
         item = await parser_movies.create_date_movie()
         image = item['poster']
-        await message.answer_photo(types.InputFile(io.BytesIO(image),
+        await message.answer_photo(types.BufferedInputFile(image,
                                                    filename='poster.jpg'),
                                    caption=f'Название: {item["name"]}'
                                            f'\nГод: {item["year"]}'
@@ -75,7 +74,7 @@ async def watch_movie(message: Message):
         add_date.add_movie_in_db(message, item['name'], item['year'])
     item = await parser_movies.create_date_movie()
     image = item['poster']
-    await message.answer_photo(types.InputFile(io.BytesIO(image),
+    await message.answer_photo(types.BufferedInputFile(image,
                                                filename='poster.jpg'),
                                caption=f'Название: {item["name"]}'
                                        f'\nГод: {item["year"]}'
@@ -88,7 +87,7 @@ async def watch_movie(message: Message):
 async def not_watch_movie(message: Message):
     item = await parser_movies.create_date_movie()
     image = item['poster']
-    await message.answer_photo(types.InputFile(io.BytesIO(image),
+    await message.answer_photo(types.BufferedInputFile(image,
                                                filename='poster.jpg'),
                                caption=f'Название: {item["name"]}'
                                        f'\nГод: {item["year"]}'
