@@ -22,8 +22,7 @@
 
 Установите необходимые библиотеки, используя pip:
 
-`bash
-pip install -r requirements.txt
+- pip install -r requirements.txt
 
 Создайте файл .env в корневой директории проекта и укажите в нем токен вашего Телеграм бота и Токен КиноПоиска:
 - BOT_TOKEN = YOUR_TOKEN
@@ -31,4 +30,4 @@ pip install -r requirements.txt
 
 Запустите бота с помощью следующей команды:
 
--python3 bot_add_movies.py
+- python3 bot_add_movies.py
