@@ -72,15 +72,15 @@ async def watch_movie(message: Message):
                                    )
     else:
         add_date.add_movie_in_db(message, item['name'], item['year'])
-    item = await parser_movies.create_date_movie()
-    image = item['poster']
-    await message.answer_photo(types.BufferedInputFile(image,
-                                               filename='poster.jpg'),
-                               caption=f'Название: {item["name"]}'
-                                       f'\nГод: {item["year"]}'
-                                       f'\nОписание: {item["description"]}',
-                               reply_markup=keyboard.keyboard
-                               )
+        item = await parser_movies.create_date_movie()
+        image = item['poster']
+        await message.answer_photo(types.BufferedInputFile(image,
+                                                   filename='poster.jpg'),
+                                   caption=f'Название: {item["name"]}'
+                                           f'\nГод: {item["year"]}'
+                                           f'\nОписание: {item["description"]}',
+                                   reply_markup=keyboard.keyboard
+                                   )
 
 
 @dp.message(F.text=='Не смотреть')

@@ -62,14 +62,15 @@ def add_movie_in_db(user, name, year):
         CREATE TABLE IF NOT EXISTS movies
         (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT,
+        name TEXT,
+        year TEXT,
         user_id INTEGER,
         FOREIGN KEY (user_id) REFERENCES users(id)
         )
         '''
     )
     user_id_to_find = user.from_user.id
-    cursor.execute('SELECT id FROM users WHERE user_id = ?', (user_id_to_find,))
+    cursor.execute('SELECT id FROM users WHERE user_name_id = ?', (user_id_to_find,))
     user_id = cursor.fetchone()[0]
     movie_data = {
         'name': name,
@@ -77,7 +78,7 @@ def add_movie_in_db(user, name, year):
     }
     cursor.execute(
         '''INSERT INTO movies (name, year, user_id)
-         VALUES (?, ?, ?, ?, ?)''',
+         VALUES (?, ?, ?)''',
         (
          movie_data['name'],
          movie_data['year'],
@@ -113,8 +114,14 @@ def search_user_in_db(user):
         return False
 
 
-
-
+#
+# conn = sqlite3.connect('date_user_movies.db')
+# cursor = conn.cursor()
+# cursor.execute('SELECT * FROM movies')
+# row = cursor.fetchall()
+# for i in row:
+#     print(i)
+# conn.close()
 
 
 
