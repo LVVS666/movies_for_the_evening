@@ -45,10 +45,9 @@ def users_add_to_session(user):
     conn.close()
 
 
-def add_second_user_in_session(second_user):
+def add_second_user_in_session(user_id):
     conn = sqlite3.connect('date_user_movies.db')
     cursor = conn.cursor()
-    user_id = second_user
     cursor.execute('INSERT INTO users (user_name_id, session_id) VALUES (?, ?)', (user_id, session_id))
     conn.commit()
     conn.close()
@@ -72,19 +71,7 @@ def add_movie_in_db(user, name, year):
     user_id_to_find = user.from_user.id
     cursor.execute('SELECT id FROM users WHERE user_name_id = ?', (user_id_to_find,))
     user_id = cursor.fetchone()[0]
-    movie_data = {
-        'name': name,
-        'year': year,
-    }
-    cursor.execute(
-        '''INSERT INTO movies (name, year, user_id)
-         VALUES (?, ?, ?)''',
-        (
-         movie_data['name'],
-         movie_data['year'],
-         user_id
-         )
-    )
+    cursor.execute('INSERT INTO movies (name, year, user_id) VALUES (?, ?, ?)', (name, year, user_id))
     conn.commit()
     conn.close()
 
@@ -114,14 +101,14 @@ def search_user_in_db(user):
         return False
 
 
-#
-# conn = sqlite3.connect('date_user_movies.db')
-# cursor = conn.cursor()
-# cursor.execute('SELECT * FROM movies')
-# row = cursor.fetchall()
-# for i in row:
-#     print(i)
-# conn.close()
+
+conn = sqlite3.connect('date_user_movies.db')
+cursor = conn.cursor()
+cursor.execute('SELECT * FROM users')
+row = cursor.fetchall()
+for i in row:
+    print(i)
+conn.close()
 
 
 

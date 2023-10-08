@@ -24,11 +24,13 @@ add_date.create_db()
 @dp.message(Command('start'))
 async def start(message: Message, state: FSMContext):
     global item
+    global second_user_id
     if add_date.search_user_in_db(message) == False:
         add_date.users_add_to_session(message)
         await message.answer('Введите ID второго пользователя:')
         await state.set_state(FSM.UserState.user_add_db_state)
     else:
+        # second_user_id = 'ввести сюда id первого пользователя'
         item = await parser_movies.create_date_movie()
         image = item['poster']
         await message.answer_photo(types.BufferedInputFile(image, filename='poster.jpg'),
