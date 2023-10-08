@@ -1,7 +1,7 @@
 from aiogram.types import KeyboardButton,ReplyKeyboardMarkup
 
 kb = [
-    [KeyboardButton(text='Cмотреть')],
+    [KeyboardButton(text='Смотреть')],
     [KeyboardButton(text='Не смотреть')]
       ]
 

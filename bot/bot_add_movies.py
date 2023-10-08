@@ -58,7 +58,7 @@ async def add_to_second_users_to_bd(message: Message, state: FSMContext):
                                )
 
 
-@dp.message(F.text =='Смотреть')
+@dp.message(F.text == 'Смотреть')
 async def watch_movie(message: Message):
     global item
     if add_date.search_movies_in_db(second_user_id, item['name']):
@@ -85,7 +85,7 @@ async def watch_movie(message: Message):
                                    )
 
 
-@dp.message(F.text=='Не смотреть')
+@dp.message(F.text == 'Не смотреть')
 async def not_watch_movie(message: Message):
     item = await parser_movies.create_date_movie()
     image = item['poster']

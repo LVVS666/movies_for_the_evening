@@ -62,7 +62,7 @@ def add_movie_in_db(user, name, year):
         (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
-        year TEXT,
+        year INTEGER,
         user_id INTEGER,
         FOREIGN KEY (user_id) REFERENCES users(id)
         )
@@ -102,13 +102,13 @@ def search_user_in_db(user):
 
 
 
-conn = sqlite3.connect('date_user_movies.db')
-cursor = conn.cursor()
-cursor.execute('SELECT * FROM users')
-row = cursor.fetchall()
-for i in row:
-    print(i)
-conn.close()
-
-
+# conn = sqlite3.connect('date_user_movies.db')
+# cursor = conn.cursor()
+# cursor.execute('SELECT * FROM movies')
+# row = cursor.fetchall()
+# for i in row:
+#     print(i)
+# conn.close()
+#
+#
 
