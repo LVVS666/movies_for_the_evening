@@ -1,6 +1,5 @@
 import asyncio
-import io
-import tempfile
+
 
 from aiogram import Bot, Dispatcher, types, F
 import os
@@ -24,13 +23,11 @@ add_date.create_db()
 @dp.message(Command('start'))
 async def start(message: Message, state: FSMContext):
     global item
-    global second_user_id
-    if add_date.search_user_in_db(message) == False:
-        add_date.users_add_to_session(message)
+    if add_date.search_user_in_db(message.from_user.id) == False:
+        add_date.users_add_to_session(message.from_user.id)
         await message.answer('Введите ID второго пользователя:')
         await state.set_state(FSM.UserState.user_add_db_state)
     else:
-        # second_user_id = 'ввести сюда id первого пользователя'
         item = await parser_movies.create_date_movie()
         image = item['poster']
         await message.answer_photo(types.BufferedInputFile(image, filename='poster.jpg'),
@@ -43,7 +40,6 @@ async def start(message: Message, state: FSMContext):
 
 @dp.message(FSM.UserState.user_add_db_state, F.text)
 async def add_to_second_users_to_bd(message: Message, state: FSMContext):
-    global second_user_id
     second_user_id = int(message.text)
     add_date.add_second_user_in_session(second_user_id)
     await message.answer('Пользователь успешно добавлен!')
@@ -61,6 +57,10 @@ async def add_to_second_users_to_bd(message: Message, state: FSMContext):
 @dp.message(F.text == 'Смотреть')
 async def watch_movie(message: Message):
     global item
+    list_users = add_date.create_list_users()
+    second_user_id = list_users[1]
+    if message.from_user.id == list_users[1]:
+        second_user_id = list_users[0]
     if add_date.search_movies_in_db(second_user_id, item['name']):
         await message.answer('Фильм есть у второго пользователя!Приятного просмотра')
         item = await parser_movies.create_date_movie()
@@ -73,7 +73,7 @@ async def watch_movie(message: Message):
                                    reply_markup=keyboard.keyboard
                                    )
     else:
-        add_date.add_movie_in_db(message, item['name'], item['year'])
+        add_date.add_movie_in_db(message.from_user.id, item['name'], item['year'])
         item = await parser_movies.create_date_movie()
         image = item['poster']
         await message.answer_photo(types.BufferedInputFile(image,

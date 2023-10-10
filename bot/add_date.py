@@ -25,6 +25,18 @@ def create_db():
         FOREIGN KEY (session_id) REFERENCES sessions(id))
         '''
     )
+    cursor.execute(
+        '''
+        CREATE TABLE IF NOT EXISTS movies
+        (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        year INTEGER,
+        user_id INTEGER,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+        '''
+    )
     conn.commit()
     conn.close()
 
@@ -39,8 +51,7 @@ def users_add_to_session(user):
 
     cursor.execute('INSERT INTO sessions (session_name) VALUES (?)', (session_name,))
     session_id = cursor.lastrowid
-    user_id = user.from_user.id
-    cursor.execute('INSERT INTO users (user_name_id, session_id) VALUES (?, ?)', (user_id, session_id))
+    cursor.execute('INSERT INTO users (user_name_id, session_id) VALUES (?, ?)', (user, session_id))
     conn.commit()
     conn.close()
 
@@ -56,20 +67,7 @@ def add_second_user_in_session(user_id):
 def add_movie_in_db(user, name, year):
     conn = sqlite3.connect('date_user_movies.db')
     cursor = conn.cursor()
-    cursor.execute(
-        '''
-        CREATE TABLE IF NOT EXISTS movies
-        (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        year INTEGER,
-        user_id INTEGER,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-        )
-        '''
-    )
-    user_id_to_find = user.from_user.id
-    cursor.execute('SELECT id FROM users WHERE user_name_id = ?', (user_id_to_find,))
+    cursor.execute('SELECT id FROM users WHERE user_name_id = ?', (user,))
     user_id = cursor.fetchone()[0]
     cursor.execute('INSERT INTO movies (name, year, user_id) VALUES (?, ?, ?)', (name, year, user_id))
     conn.commit()
@@ -79,9 +77,7 @@ def add_movie_in_db(user, name, year):
 def search_movies_in_db(user, movie):
     conn = sqlite3.connect('date_user_movies.db')
     cursor = conn.cursor()
-    cursor.execute('''SELECT * FROM movies'
-                   WHERE user_id = (SELECT id FROM users WHERE user_name_id = ?)
-                   AND name = ? ''', (user, movie))
+    cursor.execute('SELECT * FROM movies WHERE user_id = (SELECT id FROM users WHERE user_name_id = ?) AND name = ?', (user, movie))
     found_movies = cursor.fetchall()
     conn.close()
     if found_movies:
@@ -92,7 +88,7 @@ def search_movies_in_db(user, movie):
 def search_user_in_db(user):
     conn = sqlite3.connect('date_user_movies.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM users WHERE user_name_id = ?', (user.from_user.id,))
+    cursor.execute('SELECT * FROM users WHERE user_name_id = ?', (user,))
     found_user = cursor.fetchall()
     conn.close()
     if found_user:
@@ -101,14 +97,14 @@ def search_user_in_db(user):
         return False
 
 
-
-# conn = sqlite3.connect('date_user_movies.db')
-# cursor = conn.cursor()
-# cursor.execute('SELECT * FROM movies')
-# row = cursor.fetchall()
-# for i in row:
-#     print(i)
-# conn.close()
-#
-#
+def create_list_users():
+    conn = sqlite3.connect('date_user_movies.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM users')
+    row = cursor.fetchall()
+    list_users = []
+    for i in row:
+        list_users.append(i[1])
+    conn.close()
+    return list_users
 
