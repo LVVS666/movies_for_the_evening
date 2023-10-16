@@ -11,11 +11,8 @@ KINO_TOKEN = os.getenv('KINO_TOKEN')
 kp = KinopoiskDev(token=KINO_TOKEN)
 
 
-def upload_image(item):
-    image = []
-    for i in item.poster:
-        image.append(i[1])
-    response = requests.get(image[1])
+def upload_image(image):
+    response = requests.get(image)
     image_data = response.content
     image_poster = Image.open(BytesIO(image_data))
     image_poster = image_poster.convert('RGB')
@@ -26,11 +23,14 @@ def upload_image(item):
 
 async def create_date_movie():
     item = await kp.arandom()
+    image = []
+    for i in item.poster:
+        image.append(i[1])
     date_movie = {
         'name': item.name,
         'year': item.year,
         'description': item.description,
-        'poster': upload_image(item),
+        'poster': image[1],
     }
     return date_movie
 

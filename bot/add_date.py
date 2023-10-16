@@ -37,6 +37,18 @@ def create_db():
         )
         '''
     )
+    cursor.execute(
+        '''
+        CREATE TABLE IF NOT EXISTS movies_date
+        (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        year INTEGER,
+        description TEXT,
+        poster TEXT
+        )
+        '''
+    )
     conn.commit()
     conn.close()
 
@@ -96,6 +108,28 @@ def search_user_in_db(user):
     else:
         return False
 
+def create_movie_date(item):
+    conn = sqlite3.connect('date_user_movies.db')
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO movies_date (name, year, description, poster) VALUES (?, ?, ?, ?)', (item['name'], item['year'], item['description'], item['poster']))
+    conn.commit()
+    conn.close()
+
+def return_movie(id):
+    conn = sqlite3.connect('date_user_movies.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM movies_date WHERE id = ?', (id,))
+    date = cursor.fetchall()
+    date_movie = {
+        'name': date[0][1],
+        'year': date[0][2],
+        'description': date[0][3],
+        'poster': date[0][4],
+    }
+    conn.close()
+    return date_movie
+
+
 
 def create_list_users():
     conn = sqlite3.connect('date_user_movies.db')
@@ -108,3 +142,8 @@ def create_list_users():
     conn.close()
     return list_users
 
+conn = sqlite3.connect('date_user_movies.db')
+cursor = conn.cursor()
+cursor.execute('SELECT * FROM movies_date')
+row = cursor.fetchall()
+print(row)

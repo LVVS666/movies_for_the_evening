@@ -18,18 +18,22 @@ BOT_TOKEN = os.getenv('BOT_TOKEN')
 bot = Bot(BOT_TOKEN)
 dp = Dispatcher()
 add_date.create_db()
-
+id_movie = 0
 
 @dp.message(Command('start'))
 async def start(message: Message, state: FSMContext):
+    global id_movie
     global item
     if add_date.search_user_in_db(message.from_user.id) == False:
         add_date.users_add_to_session(message.from_user.id)
         await message.answer('Введите ID второго пользователя:')
         await state.set_state(FSM.UserState.user_add_db_state)
     else:
-        item = await parser_movies.create_date_movie()
-        image = item['poster']
+        id_movie += 1
+        item_date = await parser_movies.create_date_movie()
+        add_date.create_movie_date(item_date)
+        item = add_date.return_movie(id_movie)
+        image = parser_movies.upload_image(item['poster'])
         await message.answer_photo(types.BufferedInputFile(image, filename='poster.jpg'),
                                    caption=f'Название: {item["name"]}'
                                            f'\nГод: {item["year"]}'
@@ -40,12 +44,16 @@ async def start(message: Message, state: FSMContext):
 
 @dp.message(FSM.UserState.user_add_db_state, F.text)
 async def add_to_second_users_to_bd(message: Message, state: FSMContext):
+    global id_movie
     second_user_id = int(message.text)
     add_date.add_second_user_in_session(second_user_id)
     await message.answer('Пользователь успешно добавлен!')
     await state.clear()
-    item = await parser_movies.create_date_movie()
-    image = item['poster']
+    id_movie += 1
+    item_date = await parser_movies.create_date_movie()
+    add_date.create_movie_date(item_date)
+    item = add_date.return_movie(id_movie)
+    image = parser_movies.upload_image(item['poster'])
     await message.answer_photo(types.BufferedInputFile(image, filename='poster.jpg'),
                                caption=f'Название: {item["name"]}'
                                        f'\nГод: {item["year"]}'
@@ -56,6 +64,7 @@ async def add_to_second_users_to_bd(message: Message, state: FSMContext):
 
 @dp.message(F.text == 'Смотреть')
 async def watch_movie(message: Message):
+    global id_movie
     global item
     list_users = add_date.create_list_users()
     second_user_id = list_users[1]
@@ -63,10 +72,12 @@ async def watch_movie(message: Message):
         second_user_id = list_users[0]
     if add_date.search_movies_in_db(second_user_id, item['name']):
         await message.answer('Фильм есть у второго пользователя!Приятного просмотра')
-        item = await parser_movies.create_date_movie()
-        image = item['poster']
-        await message.answer_photo(types.BufferedInputFile(image,
-                                                   filename='poster.jpg'),
+        id_movie += 1
+        item_date = await parser_movies.create_date_movie()
+        add_date.create_movie_date(item_date)
+        item = add_date.return_movie(id_movie)
+        image = parser_movies.upload_image(item['poster'])
+        await message.answer_photo(types.BufferedInputFile(image, filename='poster.jpg'),
                                    caption=f'Название: {item["name"]}'
                                            f'\nГод: {item["year"]}'
                                            f'\nОписание: {item["description"]}',
@@ -74,10 +85,12 @@ async def watch_movie(message: Message):
                                    )
     else:
         add_date.add_movie_in_db(message.from_user.id, item['name'], item['year'])
-        item = await parser_movies.create_date_movie()
-        image = item['poster']
-        await message.answer_photo(types.BufferedInputFile(image,
-                                                   filename='poster.jpg'),
+        id_movie += 1
+        item_date = await parser_movies.create_date_movie()
+        add_date.create_movie_date(item_date)
+        item = add_date.return_movie(id_movie)
+        image = parser_movies.upload_image(item['poster'])
+        await message.answer_photo(types.BufferedInputFile(image, filename='poster.jpg'),
                                    caption=f'Название: {item["name"]}'
                                            f'\nГод: {item["year"]}'
                                            f'\nОписание: {item["description"]}',
@@ -87,10 +100,13 @@ async def watch_movie(message: Message):
 
 @dp.message(F.text == 'Не смотреть')
 async def not_watch_movie(message: Message):
-    item = await parser_movies.create_date_movie()
-    image = item['poster']
-    await message.answer_photo(types.BufferedInputFile(image,
-                                               filename='poster.jpg'),
+    global id_movie
+    id_movie += 1
+    item_date = await parser_movies.create_date_movie()
+    add_date.create_movie_date(item_date)
+    item = add_date.return_movie(id_movie)
+    image = parser_movies.upload_image(item['poster'])
+    await message.answer_photo(types.BufferedInputFile(image, filename='poster.jpg'),
                                caption=f'Название: {item["name"]}'
                                        f'\nГод: {item["year"]}'
                                        f'\nОписание: {item["description"]}',
