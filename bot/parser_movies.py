@@ -1,6 +1,5 @@
 import os
 import requests
-import asyncio
 from PIL import Image
 from dotenv import load_dotenv
 from kinopoisk_dev import KinopoiskDev
@@ -33,6 +32,3 @@ async def create_date_movie():
         'poster': image[1],
     }
     return date_movie
-
-
-

@@ -1,16 +1,12 @@
 import asyncio
-
-
-from aiogram import Bot, Dispatcher, types, F
+from aiogram import Bot, Dispatcher, F
 import os
 from aiogram.filters.command import Command
 from aiogram.types import Message
 from dotenv import load_dotenv
 from aiogram.fsm.context import FSMContext
-import FSM
-import parser_movies
-import add_date
-import keyboard
+import FSM, parser_movies, add_date, func_answer
+
 
 load_dotenv()
 
@@ -25,7 +21,6 @@ coincidence = None
 async def start(message: Message, state: FSMContext):
     user_data = await state.get_data()
     id_movie = user_data.get('id_movie', 0)
-    item = user_data.get('item', None)
     if add_date.search_user_in_db(message.from_user.id) == False:
         add_date.users_add_to_session(message.from_user.id)
         await message.answer('Введите ID второго пользователя:')
@@ -35,13 +30,7 @@ async def start(message: Message, state: FSMContext):
         item_date = await parser_movies.create_date_movie()
         add_date.create_movie_date(item_date)
         item = add_date.return_movie(id_movie)
-        image = parser_movies.upload_image(item['poster'])
-        await message.answer_photo(types.BufferedInputFile(image, filename='poster.jpg'),
-                                   caption=f'Название: {item["name"]}'
-                                           f'\nГод: {item["year"]}'
-                                           f'\nОписание: {item["description"]}',
-                                   reply_markup=keyboard.keyboard
-                                   )
+        await func_answer.movie_answer(message, item)
         await state.update_data(id_movie=id_movie, item=item)
 
 
@@ -49,7 +38,6 @@ async def start(message: Message, state: FSMContext):
 async def add_to_second_users_to_bd(message: Message, state: FSMContext):
     user_data = await state.get_data()
     id_movie = user_data.get('id_movie', 0)
-    item = user_data.get('item', None)
     second_user_id = int(message.text)
     add_date.add_second_user_in_session(second_user_id)
     await message.answer('Пользователь успешно добавлен!')
@@ -58,28 +46,16 @@ async def add_to_second_users_to_bd(message: Message, state: FSMContext):
     item_date = await parser_movies.create_date_movie()
     add_date.create_movie_date(item_date)
     item = add_date.return_movie(id_movie)
-    image = parser_movies.upload_image(item['poster'])
-    await message.answer_photo(types.BufferedInputFile(image, filename='poster.jpg'),
-                               caption=f'Название: {item["name"]}'
-                                       f'\nГод: {item["year"]}'
-                                       f'\nОписание: {item["description"]}',
-                               reply_markup=keyboard.keyboard
-                               )
+    await func_answer.movie_answer(message, item)
     await state.update_data(id_movie=id_movie, item=item)
 
 
 @dp.message(F.text == 'Смотреть')
 async def watch_movie(message: Message, state: FSMContext):
     global coincidence
-    if coincidence != None:
-        image = parser_movies.upload_image(coincidence['poster'])
-        await message.answer('Фильм есть у второго пользователя!Приятного просмотра')
-        await message.answer_photo(types.BufferedInputFile(image, filename='poster.jpg'),
-                                   caption=f'Название: {coincidence["name"]}'
-                                           f'\nГод: {coincidence["year"]}'
-                                           f'\nОписание: {coincidence["description"]}',
-                                   )
-        coincidence = None
+    if coincidence != False:
+        await func_answer.coincidence_answer(message, coincidence)
+        coincidence = False
     user_data = await state.get_data()
     id_movie = user_data.get('id_movie', 0)
     item = user_data.get('item', None)
@@ -89,24 +65,12 @@ async def watch_movie(message: Message, state: FSMContext):
         second_user_id = list_users[0]
     if add_date.search_movies_in_db(second_user_id, item['name']):
         coincidence = item
-        image = parser_movies.upload_image(item['poster'])
-        await message.answer('Фильм есть у второго пользователя!Приятного просмотра')
-        await message.answer_photo(types.BufferedInputFile(image, filename='poster.jpg'),
-                                   caption=f'Название: {item["name"]}'
-                                           f'\nГод: {item["year"]}'
-                                           f'\nОписание: {item["description"]}',
-                                   )
+        await func_answer.coincidence_answer(message, coincidence)
         id_movie += 1
         item_date = await parser_movies.create_date_movie()
         add_date.create_movie_date(item_date)
         item = add_date.return_movie(id_movie)
-        image = parser_movies.upload_image(item['poster'])
-        await message.answer_photo(types.BufferedInputFile(image, filename='poster.jpg'),
-                                   caption=f'Название: {item["name"]}'
-                                           f'\nГод: {item["year"]}'
-                                           f'\nОписание: {item["description"]}',
-                                   reply_markup=keyboard.keyboard
-                                   )
+        await func_answer.movie_answer(message, item)
         await state.update_data(id_movie=id_movie, item=item)
     else:
         add_date.add_movie_in_db(message.from_user.id, item['name'], item['year'])
@@ -114,13 +78,7 @@ async def watch_movie(message: Message, state: FSMContext):
         item_date = await parser_movies.create_date_movie()
         add_date.create_movie_date(item_date)
         item = add_date.return_movie(id_movie)
-        image = parser_movies.upload_image(item['poster'])
-        await message.answer_photo(types.BufferedInputFile(image, filename='poster.jpg'),
-                                   caption=f'Название: {item["name"]}'
-                                           f'\nГод: {item["year"]}'
-                                           f'\nОписание: {item["description"]}',
-                                   reply_markup=keyboard.keyboard
-                                   )
+        await func_answer.movie_answer(message, item)
         await state.update_data(id_movie=id_movie, item=item)
 
 
@@ -128,28 +86,15 @@ async def watch_movie(message: Message, state: FSMContext):
 async def not_watch_movie(message: Message, state: FSMContext):
     global coincidence
     if coincidence != None:
-        image = parser_movies.upload_image(coincidence['poster'])
-        await message.answer('Фильм есть у второго пользователя!Приятного просмотра')
-        await message.answer_photo(types.BufferedInputFile(image, filename='poster.jpg'),
-                                   caption=f'Название: {coincidence["name"]}'
-                                           f'\nГод: {coincidence["year"]}'
-                                           f'\nОписание: {coincidence["description"]}',
-                                   )
+        await func_answer.coincidence_answer(message, coincidence)
         coincidence = None
     user_data = await state.get_data()
     id_movie = user_data.get('id_movie', 0)
-    item = user_data.get('item', None)
     id_movie += 1
     item_date = await parser_movies.create_date_movie()
     add_date.create_movie_date(item_date)
     item = add_date.return_movie(id_movie)
-    image = parser_movies.upload_image(item['poster'])
-    await message.answer_photo(types.BufferedInputFile(image, filename='poster.jpg'),
-                               caption=f'Название: {item["name"]}'
-                                       f'\nГод: {item["year"]}'
-                                       f'\nОписание: {item["description"]}',
-                               reply_markup=keyboard.keyboard
-                               )
+    await func_answer.movie_answer(message, item)
     await state.update_data(id_movie=id_movie, item=item)
 
 
