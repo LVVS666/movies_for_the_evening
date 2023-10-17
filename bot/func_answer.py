@@ -1,6 +1,7 @@
 from aiogram import types
 
-import parser_movies, keyboard
+import keyboard
+import parser_movies
 
 
 async def movie_answer(message, item):

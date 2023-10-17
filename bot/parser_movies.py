@@ -1,9 +1,10 @@
 import os
+from io import BytesIO
+
 import requests
-from PIL import Image
 from dotenv import load_dotenv
 from kinopoisk_dev import KinopoiskDev
-from io import BytesIO
+from PIL import Image
 
 load_dotenv()
 KINO_TOKEN = os.getenv("KINO_TOKEN")

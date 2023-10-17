@@ -1,12 +1,16 @@
 import asyncio
-from aiogram import Bot, Dispatcher, F
 import os
+
+from aiogram import Bot, Dispatcher, F
 from aiogram.filters.command import Command
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from dotenv import load_dotenv
-from aiogram.fsm.context import FSMContext
-import FSM, parser_movies, add_date, func_answer
 
+import add_date
+import FSM
+import func_answer
+import parser_movies
 
 load_dotenv()
 

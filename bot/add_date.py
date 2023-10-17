@@ -1,6 +1,6 @@
+import random
 import sqlite3
 import string
-import random
 
 
 def create_db():
