@@ -52,6 +52,7 @@ def create_db():
     conn.commit()
     conn.close()
 
+
 def users_add_to_session(user):
     global session_id
     conn = sqlite3.connect('date_user_movies.db')
@@ -97,6 +98,7 @@ def search_movies_in_db(user, movie):
     else:
         return False
 
+
 def search_user_in_db(user):
     conn = sqlite3.connect('date_user_movies.db')
     cursor = conn.cursor()
@@ -108,12 +110,14 @@ def search_user_in_db(user):
     else:
         return False
 
+
 def create_movie_date(item):
     conn = sqlite3.connect('date_user_movies.db')
     cursor = conn.cursor()
     cursor.execute('INSERT INTO movies_date (name, year, description, poster) VALUES (?, ?, ?, ?)', (item['name'], item['year'], item['description'], item['poster']))
     conn.commit()
     conn.close()
+
 
 def return_movie(id):
     conn = sqlite3.connect('date_user_movies.db')
@@ -130,7 +134,6 @@ def return_movie(id):
     return date_movie
 
 
-
 def create_list_users():
     conn = sqlite3.connect('date_user_movies.db')
     cursor = conn.cursor()
@@ -141,9 +144,3 @@ def create_list_users():
         list_users.append(i[1])
     conn.close()
     return list_users
-
-# conn = sqlite3.connect('date_user_movies.db')
-# cursor = conn.cursor()
-# cursor.execute('SELECT * FROM movies_date')
-# row = cursor.fetchall()
-# print(row)
