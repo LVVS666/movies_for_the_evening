@@ -18,6 +18,7 @@ BOT_TOKEN = os.getenv('BOT_TOKEN')
 bot = Bot(BOT_TOKEN)
 dp = Dispatcher()
 add_date.create_db()
+coincidence = None
 
 
 @dp.message(Command('start'))
@@ -69,6 +70,16 @@ async def add_to_second_users_to_bd(message: Message, state: FSMContext):
 
 @dp.message(F.text == 'Смотреть')
 async def watch_movie(message: Message, state: FSMContext):
+    global coincidence
+    if coincidence != None:
+        image = parser_movies.upload_image(coincidence['poster'])
+        await message.answer('Фильм есть у второго пользователя!Приятного просмотра')
+        await message.answer_photo(types.BufferedInputFile(image, filename='poster.jpg'),
+                                   caption=f'Название: {coincidence["name"]}'
+                                           f'\nГод: {coincidence["year"]}'
+                                           f'\nОписание: {coincidence["description"]}',
+                                   )
+        coincidence = None
     user_data = await state.get_data()
     id_movie = user_data.get('id_movie', 0)
     item = user_data.get('item', None)
@@ -77,7 +88,14 @@ async def watch_movie(message: Message, state: FSMContext):
     if message.from_user.id == list_users[1]:
         second_user_id = list_users[0]
     if add_date.search_movies_in_db(second_user_id, item['name']):
+        coincidence = item
+        image = parser_movies.upload_image(item['poster'])
         await message.answer('Фильм есть у второго пользователя!Приятного просмотра')
+        await message.answer_photo(types.BufferedInputFile(image, filename='poster.jpg'),
+                                   caption=f'Название: {item["name"]}'
+                                           f'\nГод: {item["year"]}'
+                                           f'\nОписание: {item["description"]}',
+                                   )
         id_movie += 1
         item_date = await parser_movies.create_date_movie()
         add_date.create_movie_date(item_date)
@@ -108,6 +126,16 @@ async def watch_movie(message: Message, state: FSMContext):
 
 @dp.message(F.text == 'Не смотреть')
 async def not_watch_movie(message: Message, state: FSMContext):
+    global coincidence
+    if coincidence != None:
+        image = parser_movies.upload_image(coincidence['poster'])
+        await message.answer('Фильм есть у второго пользователя!Приятного просмотра')
+        await message.answer_photo(types.BufferedInputFile(image, filename='poster.jpg'),
+                                   caption=f'Название: {coincidence["name"]}'
+                                           f'\nГод: {coincidence["year"]}'
+                                           f'\nОписание: {coincidence["description"]}',
+                                   )
+        coincidence = None
     user_data = await state.get_data()
     id_movie = user_data.get('id_movie', 0)
     item = user_data.get('item', None)
