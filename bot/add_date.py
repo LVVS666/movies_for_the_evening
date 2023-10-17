@@ -142,8 +142,8 @@ def create_list_users():
     conn.close()
     return list_users
 
-conn = sqlite3.connect('date_user_movies.db')
-cursor = conn.cursor()
-cursor.execute('SELECT * FROM movies_date')
-row = cursor.fetchall()
-print(row)
+# conn = sqlite3.connect('date_user_movies.db')
+# cursor = conn.cursor()
+# cursor.execute('SELECT * FROM movies_date')
+# row = cursor.fetchall()
+# print(row)

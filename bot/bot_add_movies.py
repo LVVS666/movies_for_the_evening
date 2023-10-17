@@ -18,12 +18,13 @@ BOT_TOKEN = os.getenv('BOT_TOKEN')
 bot = Bot(BOT_TOKEN)
 dp = Dispatcher()
 add_date.create_db()
-id_movie = 0
+
 
 @dp.message(Command('start'))
 async def start(message: Message, state: FSMContext):
-    global id_movie
-    global item
+    user_data = await state.get_data()
+    id_movie = user_data.get('id_movie', 0)
+    item = user_data.get('item', None)
     if add_date.search_user_in_db(message.from_user.id) == False:
         add_date.users_add_to_session(message.from_user.id)
         await message.answer('Введите ID второго пользователя:')
@@ -40,11 +41,14 @@ async def start(message: Message, state: FSMContext):
                                            f'\nОписание: {item["description"]}',
                                    reply_markup=keyboard.keyboard
                                    )
+        await state.update_data(id_movie=id_movie, item=item)
 
 
 @dp.message(FSM.UserState.user_add_db_state, F.text)
 async def add_to_second_users_to_bd(message: Message, state: FSMContext):
-    global id_movie
+    user_data = await state.get_data()
+    id_movie = user_data.get('id_movie', 0)
+    item = user_data.get('item', None)
     second_user_id = int(message.text)
     add_date.add_second_user_in_session(second_user_id)
     await message.answer('Пользователь успешно добавлен!')
@@ -60,12 +64,14 @@ async def add_to_second_users_to_bd(message: Message, state: FSMContext):
                                        f'\nОписание: {item["description"]}',
                                reply_markup=keyboard.keyboard
                                )
+    await state.update_data(id_movie=id_movie, item=item)
 
 
 @dp.message(F.text == 'Смотреть')
-async def watch_movie(message: Message):
-    global id_movie
-    global item
+async def watch_movie(message: Message, state: FSMContext):
+    user_data = await state.get_data()
+    id_movie = user_data.get('id_movie', 0)
+    item = user_data.get('item', None)
     list_users = add_date.create_list_users()
     second_user_id = list_users[1]
     if message.from_user.id == list_users[1]:
@@ -83,6 +89,7 @@ async def watch_movie(message: Message):
                                            f'\nОписание: {item["description"]}',
                                    reply_markup=keyboard.keyboard
                                    )
+        await state.update_data(id_movie=id_movie, item=item)
     else:
         add_date.add_movie_in_db(message.from_user.id, item['name'], item['year'])
         id_movie += 1
@@ -96,11 +103,14 @@ async def watch_movie(message: Message):
                                            f'\nОписание: {item["description"]}',
                                    reply_markup=keyboard.keyboard
                                    )
+        await state.update_data(id_movie=id_movie, item=item)
 
 
 @dp.message(F.text == 'Не смотреть')
-async def not_watch_movie(message: Message):
-    global id_movie
+async def not_watch_movie(message: Message, state: FSMContext):
+    user_data = await state.get_data()
+    id_movie = user_data.get('id_movie', 0)
+    item = user_data.get('item', None)
     id_movie += 1
     item_date = await parser_movies.create_date_movie()
     add_date.create_movie_date(item_date)
@@ -112,6 +122,7 @@ async def not_watch_movie(message: Message):
                                        f'\nОписание: {item["description"]}',
                                reply_markup=keyboard.keyboard
                                )
+    await state.update_data(id_movie=id_movie, item=item)
 
 
 async def main():
