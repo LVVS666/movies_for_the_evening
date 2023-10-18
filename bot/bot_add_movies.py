@@ -18,7 +18,7 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 bot = Bot(BOT_TOKEN)
 dp = Dispatcher()
 add_date.create_db()
-coincidence = None
+coincidence = False
 
 
 @dp.message(Command("start"))
@@ -89,9 +89,9 @@ async def watch_movie(message: Message, state: FSMContext):
 @dp.message(F.text == "Не смотреть")
 async def not_watch_movie(message: Message, state: FSMContext):
     global coincidence
-    if coincidence != None:
+    if coincidence != False:
         await func_answer.coincidence_answer(message, coincidence)
-        coincidence = None
+        coincidence = False
     user_data = await state.get_data()
     id_movie = user_data.get("id_movie", 0)
     id_movie += 1
